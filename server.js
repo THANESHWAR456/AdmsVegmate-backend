@@ -47,10 +47,6 @@ const createAdmin = require(
   "./scripts/createAdmin",
 );
 
-const Admin = require(
-  "./models/Admin",
-);
-
 const app = express();
 
 const PORT =
@@ -541,6 +537,30 @@ function validateEnvironment() {
 }
 
 /**
+ * Create the first administrator account when one does not
+ * already exist yet.
+ *
+ * An account-setup problem must never prevent the public
+ * website from being served, so the reason is reported
+ * clearly and the server continues to start.
+ */
+async function seedFirstAdmin() {
+  try {
+    await createAdmin({
+      closeConnection: false,
+    });
+  } catch (error) {
+    console.error(
+      "ADMIN SETUP FAILED. The admin panel has no account to sign in with.",
+    );
+
+    console.error(
+      `Reason: ${error.message}`,
+    );
+  }
+}
+
+/**
  * Connect to MongoDB and start the Express server.
  */
 async function startServer() {
@@ -555,28 +575,7 @@ async function startServer() {
       "MongoDB connected successfully.",
     );
 
-    const adminEmail =
-      process.env.ADMIN_EMAIL?.trim().toLowerCase();
-    const adminName =
-      process.env.ADMIN_NAME?.trim();
-    const adminPassword =
-      process.env.ADMIN_PASSWORD;
-
-    if (
-      adminEmail &&
-      adminName &&
-      adminPassword
-    ) {
-      const existingAdmin = await Admin.findOne({
-          email: adminEmail,
-        });
-
-      if (!existingAdmin) {
-        await createAdmin({
-          closeConnection: false,
-        });
-      }
-    }
+    await seedFirstAdmin();
 
     app.listen(PORT, () => {
       console.log(

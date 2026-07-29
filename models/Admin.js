@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
  * truncated.
  */
 const BCRYPT_SALT_ROUNDS = 12;
-const MIN_PASSWORD_LENGTH = 15;
+const MIN_PASSWORD_LENGTH = 10;
 const MAX_PASSWORD_BYTES = 72;
 
 /**

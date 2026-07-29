@@ -15,7 +15,7 @@ const INVALID_LOGIN_MESSAGE =
 const EMAIL_PATTERN =
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const MIN_PASSWORD_LENGTH = 15;
+const MIN_PASSWORD_LENGTH = 10;
 const MAX_PASSWORD_BYTES = 72;
 
 /**
