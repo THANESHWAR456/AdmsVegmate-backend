@@ -85,6 +85,38 @@ const allowedOrigins = new Set([
   ...configuredOrigins,
 ]);
 
+const allowedProductionHostnames = new Set([
+  "adamsvegmatelimited.uk",
+  "www.adamsvegmatelimited.uk",
+]);
+
+function isAllowedBrowserOrigin(origin) {
+  if (allowedOrigins.has(origin)) {
+    return true;
+  }
+
+  if (!isProduction) {
+    return false;
+  }
+
+  try {
+    const originUrl = new URL(origin);
+
+    return (
+      originUrl.protocol === "https:" &&
+      allowedProductionHostnames.has(
+        originUrl.hostname,
+      ) ||
+      originUrl.protocol === "https:" &&
+      originUrl.hostname.endsWith(
+        ".vercel.app",
+      )
+    );
+  } catch (error) {
+    return false;
+  }
+}
+
 /**
  * Add secure HTTP response headers.
  *
@@ -113,7 +145,7 @@ app.use(
         return callback(null, true);
       }
 
-      if (allowedOrigins.has(origin)) {
+      if (isAllowedBrowserOrigin(origin)) {
         return callback(null, true);
       }
 
