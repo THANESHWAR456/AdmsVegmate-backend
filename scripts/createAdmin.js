@@ -16,7 +16,9 @@ const Admin = require("../models/Admin");
 /**
  * Create the first administrator account.
  */
-async function createAdmin() {
+async function createAdmin({
+  closeConnection = true,
+} = {}) {
   try {
     const {
       MONGO_URI,
@@ -68,9 +70,15 @@ async function createAdmin() {
     console.error("Admin creation failed:", error.message);
     process.exitCode = 1;
   } finally {
-    // Always close the database connection when the script finishes.
-    await mongoose.connection.close();
+    if (closeConnection) {
+      // Always close the database connection when the script finishes.
+      await mongoose.connection.close();
+    }
   }
 }
 
-createAdmin();
+if (require.main === module) {
+  createAdmin();
+}
+
+module.exports = createAdmin;

@@ -43,6 +43,14 @@ const websiteContentRoutes = require(
   "./routes/websiteContentRoutes",
 );
 
+const createAdmin = require(
+  "./scripts/createAdmin",
+);
+
+const Admin = require(
+  "./models/Admin",
+);
+
 const app = express();
 
 const PORT =
@@ -546,6 +554,29 @@ async function startServer() {
     console.log(
       "MongoDB connected successfully.",
     );
+
+    const adminEmail =
+      process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const adminName =
+      process.env.ADMIN_NAME?.trim();
+    const adminPassword =
+      process.env.ADMIN_PASSWORD;
+
+    if (
+      adminEmail &&
+      adminName &&
+      adminPassword
+    ) {
+      const existingAdmin = await Admin.findOne({
+          email: adminEmail,
+        });
+
+      if (!existingAdmin) {
+        await createAdmin({
+          closeConnection: false,
+        });
+      }
+    }
 
     app.listen(PORT, () => {
       console.log(
